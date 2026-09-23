@@ -1,7 +1,7 @@
 import mysql.connector
 import os
 
-SQL_FILE = os.path.join(os.path.dirname(__file__), 'migrations', '005_add_inventory_balance_and_customs_regime.sql')
+SQL_FILE = os.path.join(os.path.dirname(__file__), 'migrations', '006_reconcile_legacy_customs_schema.sql')
 
 db_config = {
     'host': os.environ.get('DB_HOST') or os.environ.get('MYSQLHOST') or 'localhost',

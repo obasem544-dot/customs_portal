@@ -1255,6 +1255,7 @@ def department_balances():
     if "user" not in session:
         return redirect("/")
 
+    ensure_item_current_balance_column()
     conn = mysql.connector.connect(**db_config)
     cur = conn.cursor(dictionary=True)
 
@@ -4171,6 +4172,7 @@ def customs_management_demo_seed():
 def render_free_zone_section(title, subtitle, inbound_type=None, status=None):
     customs_items = []
     if inbound_type or status:
+        ensure_customs_declaration_columns()
         conn = get_db_connection()
         cur = conn.cursor(dictionary=True)
         try:
@@ -4546,9 +4548,24 @@ def seed_demo_customs_data():
         conn.close()
 
 
-def ensure_customs_clearance_columns():
+def ensure_customs_declaration_columns():
     try:
         columns = {
+            'inbound_type': 'VARCHAR(100) NULL',
+            'exporter_name': 'VARCHAR(255) NULL',
+            'origin_country': 'VARCHAR(100) NULL',
+            'regime_type': 'VARCHAR(100) NULL',
+            'regime_details': 'TEXT NULL',
+            'port_of_loading': 'VARCHAR(255) NULL',
+            'port_of_destination': 'VARCHAR(255) NULL',
+            'port_of_discharge': 'VARCHAR(255) NULL',
+            'shipment_reference': 'VARCHAR(100) NULL',
+            'acid': 'VARCHAR(100) NULL',
+            'total_weight': 'DECIMAL(18,2) NULL',
+            'package_count': 'INT NULL',
+            'currency': 'VARCHAR(20) NULL',
+            'tax_card_number': 'VARCHAR(100) NULL',
+            'commercial_register_number': 'VARCHAR(100) NULL',
             'clearance_officer_name': 'VARCHAR(255) NULL',
             'clearance_officer_location': 'VARCHAR(255) NULL',
             'clearance_officer_phone': 'VARCHAR(50) NULL',
@@ -4556,6 +4573,7 @@ def ensure_customs_clearance_columns():
             'entry_date': 'DATE NULL',
             'shipment_received_at': 'DATETIME NULL',
             'distribution_time': 'DATETIME NULL',
+            'notes': 'TEXT NULL',
         }
         conn = get_db_connection()
         cur = conn.cursor()
@@ -4574,6 +4592,17 @@ def ensure_customs_clearance_columns():
     except Exception as exc:
         print(f"Database warning/error: {exc}")
         pass
+
+
+def ensure_customs_clearance_columns():
+    ensure_customs_declaration_columns()
+
+
+@app.before_request
+def ensure_customs_schema_before_request():
+    if request.path.startswith('/customs-management'):
+        ensure_customs_declaration_columns()
+        ensure_customs_status_enum()
 
 
 def ensure_customs_status_enum():
@@ -4596,6 +4625,10 @@ def ensure_customs_status_enum():
     except Exception as exc:
         print(f"Database warning/error: {exc}")
         pass
+
+
+    ensure_customs_declaration_columns()
+    ensure_customs_status_enum()
 
 
 @app.route('/customs-management/new', methods=['GET', 'POST'])
