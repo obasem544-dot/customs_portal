@@ -235,6 +235,7 @@ CREATE TABLE `customs_declarations` (
   `created_by` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `regime_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `declaration_no` (`declaration_no`),
   KEY `fk_customs_created_by` (`created_by`),
@@ -250,7 +251,7 @@ CREATE TABLE `customs_declarations` (
 
 LOCK TABLES `customs_declarations` WRITE;
 /*!40000 ALTER TABLE `customs_declarations` DISABLE KEYS */;
-INSERT INTO `customs_declarations` VALUES (1,'CUS-2026-0001','2026-05-31',NULL,'NAPESCO',NULL,NULL,NULL,NULL,NULL,0.00,0.00,'draft',NULL,'2026-05-30 21:21:26','2026-05-30 21:21:26');
+INSERT INTO `customs_declarations` VALUES (1,'CUS-2026-0001','2026-05-31',NULL,'NAPESCO',NULL,NULL,NULL,NULL,NULL,0.00,0.00,'draft',NULL,'2026-05-30 21:21:26','2026-05-30 21:21:26',NULL);
 /*!40000 ALTER TABLE `customs_declarations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -650,6 +651,7 @@ CREATE TABLE `items` (
   `unit_price` decimal(12,2) DEFAULT '0.00',
   `total_cost` decimal(12,2) DEFAULT '0.00',
   `current_stock` decimal(12,2) DEFAULT '0.00',
+  `current_balance` decimal(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `item_code` (`item_code`),
   UNIQUE KEY `barcode` (`barcode`),
