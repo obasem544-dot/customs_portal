@@ -466,6 +466,45 @@ def ensure_item_department_column():
         pass
 
 
+def ensure_item_current_balance_column():
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute("SELECT 1 FROM items LIMIT 1")
+            cur.fetchone()
+        except Exception as exc:
+            print(f"Database warning/error: {exc}")
+            return
+        finally:
+            cur.close()
+            conn.close()
+
+        if has_column('items', 'current_balance'):
+            return
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute(
+                "ALTER TABLE items ADD COLUMN current_balance DECIMAL(15,2) NOT NULL DEFAULT 0.00"
+            )
+            conn.commit()
+            schema_cache['items.current_balance'] = True
+        except Exception as exc:
+            print(f"Database warning/error: {exc}")
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+        finally:
+            cur.close()
+            conn.close()
+    except Exception as exc:
+        print(f"Database warning/error: {exc}")
+        pass
+
+
 def ensure_companies_table():
     try:
         conn = get_db_connection()
@@ -589,6 +628,7 @@ except Exception as exc:
     print(f"Database bootstrap warning: {exc}")
 
 ensure_item_department_column()
+ensure_item_current_balance_column()
 ensure_suppliers_table()
 ensure_companies_table()
 ensure_issue_voucher_reference_column()
